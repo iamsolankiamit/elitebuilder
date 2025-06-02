@@ -15,9 +15,108 @@ datasource db {
 }
 
 model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  name          String?
+  username      String    @unique
+  avatar        String?
+  githubId      String?   @unique
+  githubUrl     String?
+  portfolioUrl  String?
+  linkedinUrl   String?
+  bio           String?   @db.Text
+  location      String?
+  timezone      String?
+  careerScore   Float     @default(0)
+  isSponsor     Boolean   @default(false)
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  submissions   Submission[]
+  badges        Badge[]
+  notifications Notification[]
+  challenges    Challenge[]    @relation("ChallengeCreator")
+  participations Challenge[]   @relation("ChallengeParticipant")
+}
+
+model Badge {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  imageUrl    String
+  type        BadgeType
+  createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, name])
+}
+
+model Notification {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  type      NotificationType
+  message   String
+  read      Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Challenge {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String    @db.Text
+  dataset     String?   // URL to dataset
+  rubric      String    @db.Text
+  deadline    DateTime
+  prize       Float?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  creatorId   Int
+  creator     User      @relation("ChallengeCreator", fields: [creatorId], references: [id])
+  participants User[]   @relation("ChallengeParticipant")
+  submissions  Submission[]
+}
+
+model Submission {
+  id          Int       @id @default(autoincrement())
+  repoUrl     String
+  pitchDeck   String    // URL to pitch deck
+  demoVideo   String    // URL to demo video
+  score       Float?
+  status      SubmissionStatus @default(PENDING)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  challengeId Int
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+
+  @@unique([userId, challengeId])
+}
+
+enum BadgeType {
+  TOP_10_PERCENT
+  CATEGORY_WINNER
+  SPONSOR_FAVORITE
+  FIRST_SUBMISSION
+  PERFECT_SCORE
+  SEASON_CHAMPION
+}
+
+enum NotificationType {
+  SUBMISSION_STATUS
+  SCORE_UPDATE
+  BADGE_AWARDED
+  CHALLENGE_INVITE
+  SPONSOR_MESSAGE
+}
+
+enum SubmissionStatus {
+  PENDING
+  UNDER_REVIEW
+  SCORED
+  REJECTED
 }
