@@ -452,8 +452,94 @@ async function main() {
 
   console.log('✅ Added challenge participations');
 
+  // Add some sample submissions with scores
+  const submissions = [
+    {
+      userId: regularUsers[0].id, // Alice
+      challengeId: createdChallenges[0].id,
+      repoUrl: 'https://github.com/alicechen/ai-chatbot',
+      pitchDeck: 'https://drive.google.com/presentation/alice-chatbot',
+      demoVideo: 'https://youtube.com/watch?v=alice-demo',
+      score: 92.5,
+      status: 'SCORED' as const
+    },
+    {
+      userId: regularUsers[1].id, // Bob
+      challengeId: createdChallenges[0].id,
+      repoUrl: 'https://github.com/bobmartinez/smart-support',
+      pitchDeck: 'https://drive.google.com/presentation/bob-support',
+      demoVideo: 'https://youtube.com/watch?v=bob-demo',
+      score: 87.0,
+      status: 'SCORED' as const
+    },
+    {
+      userId: regularUsers[0].id, // Alice
+      challengeId: createdChallenges[1].id,
+      repoUrl: 'https://github.com/alicechen/code-reviewer',
+      pitchDeck: 'https://drive.google.com/presentation/alice-reviewer',
+      demoVideo: 'https://youtube.com/watch?v=alice-reviewer',
+      score: 95.0,
+      status: 'SCORED' as const
+    },
+    {
+      userId: regularUsers[2].id, // Carol
+      challengeId: createdChallenges[1].id,
+      repoUrl: 'https://github.com/carolthompson/ai-code-review',
+      pitchDeck: 'https://drive.google.com/presentation/carol-review',
+      demoVideo: 'https://youtube.com/watch?v=carol-review',
+      score: 89.5,
+      status: 'SCORED' as const
+    },
+    {
+      userId: regularUsers[1].id, // Bob
+      challengeId: createdChallenges[2].id,
+      repoUrl: 'https://github.com/bobmartinez/fintech-advisor',
+      pitchDeck: 'https://drive.google.com/presentation/bob-fintech',
+      demoVideo: 'https://youtube.com/watch?v=bob-fintech',
+      score: 85.5,
+      status: 'SCORED' as const
+    },
+    {
+      userId: regularUsers[2].id, // Carol
+      challengeId: createdChallenges[3].id,
+      repoUrl: 'https://github.com/carolthompson/ai-learning',
+      pitchDeck: 'https://drive.google.com/presentation/carol-learning',
+      demoVideo: 'https://youtube.com/watch?v=carol-learning',
+      score: 91.0,
+      status: 'SCORED' as const
+    }
+  ];
+
+  await Promise.all(
+    submissions.map((submission) =>
+      prisma.submission.create({
+        data: submission
+      })
+    )
+  );
+
+  console.log('✅ Created sample submissions with scores');
+
+  // Update career scores based on submissions
+  const updatedScores = [
+    { userId: regularUsers[0].id, newScore: 850 }, // Alice: great performer
+    { userId: regularUsers[1].id, newScore: 720 }, // Bob: solid performer  
+    { userId: regularUsers[2].id, newScore: 890 }, // Carol: top performer
+  ];
+
+  await Promise.all(
+    updatedScores.map(({ userId, newScore }) =>
+      prisma.user.update({
+        where: { id: userId },
+        data: { careerScore: newScore }
+      })
+    )
+  );
+
+  console.log('✅ Updated career scores');
+
   console.log('🎉 Seed completed successfully!');
-  console.log(`Created ${sponsorUsers.length + regularUsers.length} users and ${createdChallenges.length} challenges`);
+  console.log(`Created ${sponsorUsers.length + regularUsers.length} users, ${createdChallenges.length} challenges, and ${submissions.length} submissions`);
 }
 
 main()

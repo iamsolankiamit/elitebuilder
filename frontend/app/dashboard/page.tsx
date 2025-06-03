@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Trophy, Upload, Star, Plus } from 'lucide-react';
+import { Trophy, Upload, Star, Plus, TrendingUp } from 'lucide-react';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { Header } from '@/components/header';
@@ -191,6 +191,13 @@ export default function Dashboard() {
                         <Link href="/submissions">
                           <Upload className="mr-2 h-4 w-4" />
                           My Submissions
+                        </Link>
+                      </Button>
+
+                      <Button asChild className="w-full justify-start" variant="outline">
+                        <Link href="/evaluations">
+                          <TrendingUp className="mr-2 h-4 w-4" />
+                          Evaluation Dashboard
                         </Link>
                       </Button>
 

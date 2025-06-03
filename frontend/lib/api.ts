@@ -9,7 +9,12 @@ import type {
   UpdateChallengeDto, 
   CreateSubmissionDto, 
   Submission,
-  LeaderboardResponse 
+  ChallengeLeaderboardResponse,
+  LeaderboardResponse,
+  LeaderboardPeriod,
+  LeaderboardCategory,
+  SortBy,
+  UserRankingInfo
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -122,7 +127,7 @@ export const challengesApi = {
   },
 
   // Get challenge leaderboard
-  getLeaderboard: async (id: number): Promise<LeaderboardResponse> => {
+  getLeaderboard: async (id: number): Promise<ChallengeLeaderboardResponse> => {
     const response = await api.get(`/challenges/${id}/leaderboard`);
     return response.data;
   },
@@ -131,13 +136,18 @@ export const challengesApi = {
 export const submissionsApi = {
   // Create submission
   createSubmission: async (challengeId: number, data: CreateSubmissionDto): Promise<Submission> => {
-    const response = await api.post(`/challenges/${challengeId}/submissions`, data);
+    // Only send repoUrl, pitchDeck, and demoVideo - challengeId comes from URL parameter
+    const response = await api.post(`/challenges/${challengeId}/submissions`, {
+      repoUrl: data.repoUrl,
+      pitchDeck: data.pitchDeck,
+      demoVideo: data.demoVideo,
+    });
     return response.data;
   },
 
   // Get user's submissions
   getMySubmissions: async (): Promise<Submission[]> => {
-    const response = await api.get('/submissions/me');
+    const response = await api.get('/submissions/my-submissions');
     return response.data;
   },
 
@@ -156,5 +166,68 @@ export const submissionsApi = {
   // Delete submission
   deleteSubmission: async (id: number): Promise<void> => {
     await api.delete(`/submissions/${id}`);
+  },
+};
+
+export const leaderboardApi = {
+  // Get global leaderboard
+  getGlobalLeaderboard: async (params?: {
+    page?: number;
+    limit?: number;
+    period?: LeaderboardPeriod;
+    category?: LeaderboardCategory;
+    sortBy?: SortBy;
+  }): Promise<LeaderboardResponse> => {
+    const response = await api.get('/leaderboard/global', { params });
+    return response.data;
+  },
+
+  // Get monthly leaderboard
+  getMonthlyLeaderboard: async (params?: {
+    page?: number;
+    limit?: number;
+    category?: LeaderboardCategory;
+    sortBy?: SortBy;
+  }): Promise<LeaderboardResponse> => {
+    const response = await api.get('/leaderboard/monthly', { params });
+    return response.data;
+  },
+
+  // Get category-specific leaderboard
+  getCategoryLeaderboard: async (category: LeaderboardCategory, params?: {
+    page?: number;
+    limit?: number;
+    period?: LeaderboardPeriod;
+    sortBy?: SortBy;
+  }): Promise<LeaderboardResponse> => {
+    const response = await api.get(`/leaderboard/categories/${category}`, { params });
+    return response.data;
+  },
+
+  // Get sponsor favorites
+  getSponsorFavorites: async (params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<LeaderboardResponse> => {
+    const response = await api.get('/leaderboard/sponsor-favorites', { params });
+    return response.data;
+  },
+
+  // Get user ranking info
+  getUserRanking: async (userId?: number): Promise<UserRankingInfo> => {
+    const url = userId ? `/leaderboard/user/${userId}/ranking` : '/leaderboard/my-ranking';
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // Get leaderboard stats
+  getLeaderboardStats: async (): Promise<{
+    totalUsers: number;
+    totalSubmissions: number;
+    avgCareerScore: number;
+    topPerformers: number;
+  }> => {
+    const response = await api.get('/leaderboard/stats');
+    return response.data;
   },
 }; 

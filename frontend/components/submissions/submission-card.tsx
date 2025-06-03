@@ -18,6 +18,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EvaluationStatus } from '@/components/evaluation/evaluation-status';
 import type { Submission } from '@/lib/types';
 
 interface SubmissionCardProps {
@@ -95,13 +96,17 @@ export function SubmissionCard({
                     {submission.score}/100
                   </Badge>
                 )}
-                <Badge 
-                  variant={getStatusColor(submission.status)} 
-                  className="flex items-center gap-1 text-xs"
-                >
-                  {getStatusIcon(submission.status)}
-                  {submission.status.replace('_', ' ')}
-                </Badge>
+                {(submission.status === 'PENDING' || submission.status === 'UNDER_REVIEW') ? (
+                  <EvaluationStatus submission={submission} compact />
+                ) : (
+                  <Badge 
+                    variant={getStatusColor(submission.status)} 
+                    className="flex items-center gap-1 text-xs"
+                  >
+                    {getStatusIcon(submission.status)}
+                    {submission.status.replace('_', ' ')}
+                  </Badge>
+                )}
               </div>
             </div>
           </CardContent>

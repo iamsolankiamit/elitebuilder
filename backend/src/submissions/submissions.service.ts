@@ -4,10 +4,14 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionDto } from './dto/update-submission.dto';
 import { SubmissionQueryDto } from './dto/submission-query.dto';
 import { Prisma } from '@prisma/client';
+import { EvaluationService } from '../evaluation/evaluation.service';
 
 @Injectable()
 export class SubmissionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private evaluationService: EvaluationService,
+  ) {}
 
   async create(createSubmissionDto: CreateSubmissionDto, userId: number) {
     // Check if challenge exists and is still open
@@ -51,7 +55,7 @@ export class SubmissionsService {
       throw new BadRequestException('You have already submitted to this challenge');
     }
 
-    return this.prisma.submission.create({
+    const submission = await this.prisma.submission.create({
       data: {
         ...createSubmissionDto,
         userId,
@@ -74,6 +78,16 @@ export class SubmissionsService {
         },
       },
     });
+
+    // Queue evaluation immediately after submission creation
+    try {
+      await this.evaluationService.queueEvaluation(submission.id);
+    } catch (error) {
+      console.error('Failed to queue evaluation:', error);
+      // Don't fail the submission creation if evaluation queueing fails
+    }
+
+    return submission;
   }
 
   async findAll(query: SubmissionQueryDto) {

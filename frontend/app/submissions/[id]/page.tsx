@@ -26,6 +26,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { EvaluationStatus } from '@/components/evaluation/evaluation-status';
 import { useSubmission, useDeleteSubmission } from '@/hooks/use-challenges';
 import type { Submission } from '@/lib/types';
 
@@ -219,11 +220,22 @@ export default function SubmissionDetailPage() {
                   </motion.div>
                 )}
 
+                {/* Evaluation Status */}
+                {(submission.status === 'PENDING' || submission.status === 'UNDER_REVIEW') && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: submission.score ? 0.2 : 0.1 }}
+                  >
+                    <EvaluationStatus submission={submission} />
+                  </motion.div>
+                )}
+
                 {/* Submission Links */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+                  transition={{ duration: 0.5, delay: submission.score ? 0.3 : (submission.status === 'PENDING' || submission.status === 'UNDER_REVIEW') ? 0.2 : 0.1 }}
                 >
                   <Card>
                     <CardHeader>
