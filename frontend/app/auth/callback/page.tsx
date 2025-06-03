@@ -27,10 +27,10 @@ export default function AuthCallback() {
           throw new Error('No authentication token received');
         }
 
-        // Handle the successful authentication
-        const { user } = await authApi.handleCallback(token);
-        
+        // Set the token and fetch user profile
         setToken(token);
+        const user = await authApi.getProfile();
+        
         setUser(user);
         setStatus('success');
 

@@ -26,7 +26,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         name: true,
         username: true,
         avatar: true,
+        githubId: true,
+        githubUrl: true,
+        portfolioUrl: true,
+        linkedinUrl: true,
+        bio: true,
+        location: true,
+        timezone: true,
+        careerScore: true,
+        isSponsor: true,
         isAdmin: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
