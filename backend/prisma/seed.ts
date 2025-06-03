@@ -538,8 +538,101 @@ async function main() {
 
   console.log('✅ Updated career scores');
 
+  // Create badges for users based on their performance
+  const badges = [
+    // Alice's badges (top performer)
+    {
+      name: 'Perfect Score',
+      description: 'Achieved a perfect score of 95+ points on a challenge',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3c6.png',
+      type: 'PERFECT_SCORE' as const,
+      userId: regularUsers[0].id, // Alice (95.0 score)
+    },
+    {
+      name: 'First Submission',
+      description: 'Successfully submitted your first challenge solution',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f680.png',
+      type: 'FIRST_SUBMISSION' as const,
+      userId: regularUsers[0].id, // Alice
+    },
+    {
+      name: 'Top 10%',
+      description: 'Ranked in the top 10% of all participants this month',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png',
+      type: 'TOP_10_PERCENT' as const,
+      userId: regularUsers[0].id, // Alice
+    },
+
+    // Carol's badges (also high performer)
+    {
+      name: 'Category Winner',
+      description: 'Won first place in the AI/ML challenge category',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f947.png',
+      type: 'CATEGORY_WINNER' as const,
+      userId: regularUsers[2].id, // Carol
+    },
+    {
+      name: 'First Submission',
+      description: 'Successfully submitted your first challenge solution',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f680.png',
+      type: 'FIRST_SUBMISSION' as const,
+      userId: regularUsers[2].id, // Carol
+    },
+    {
+      name: 'Top 10%',
+      description: 'Ranked in the top 10% of all participants this month',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b50.png',
+      type: 'TOP_10_PERCENT' as const,
+      userId: regularUsers[2].id, // Carol
+    },
+
+    // Bob's badges
+    {
+      name: 'First Submission',
+      description: 'Successfully submitted your first challenge solution',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f680.png',
+      type: 'FIRST_SUBMISSION' as const,
+      userId: regularUsers[1].id, // Bob
+    },
+    {
+      name: 'Sponsor Favorite',
+      description: 'Your solution was selected as a sponsor favorite',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2764.png',
+      type: 'SPONSOR_FAVORITE' as const,
+      userId: regularUsers[1].id, // Bob
+    },
+
+    // Admin/Sponsor badges
+    {
+      name: 'Season Champion',
+      description: 'Won the most challenges in a competition season',
+      imageUrl: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f451.png',
+      type: 'SEASON_CHAMPION' as const,
+      userId: sponsorUsers[0].id, // EliteBuilders Admin
+    },
+  ];
+
+  const createdBadges = await Promise.all(
+    badges.map((badge) =>
+      prisma.badge.create({
+        data: badge,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
+          },
+        },
+      })
+    )
+  );
+
+  console.log('✅ Created badges for users');
+
   console.log('🎉 Seed completed successfully!');
-  console.log(`Created ${sponsorUsers.length + regularUsers.length} users, ${createdChallenges.length} challenges, and ${submissions.length} submissions`);
+  console.log(`Created ${sponsorUsers.length + regularUsers.length} users, ${createdChallenges.length} challenges, ${submissions.length} submissions, and ${createdBadges.length} badges`);
 }
 
 main()

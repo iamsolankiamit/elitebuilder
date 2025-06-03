@@ -24,7 +24,8 @@
     "test:evaluation:quick": "./scripts/test-evaluation.sh",
     "db:seed": "ts-node prisma/seed.ts",
     "db:reset": "prisma migrate reset --force",
-    "db:reset-seed": "prisma migrate reset --force && npm run db:seed"
+    "db:reset-seed": "prisma migrate reset --force && npm run db:seed",
+    "db:verify-badges": "ts-node scripts/verify-badges.ts"
   },
   "dependencies": {
     "@nestjs/bull": "^10.0.1",

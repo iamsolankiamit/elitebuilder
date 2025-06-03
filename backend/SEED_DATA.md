@@ -8,6 +8,8 @@ The seed script creates realistic sample data including:
 - **7 Users**: 4 sponsor/company accounts and 3 regular developer accounts
 - **6 Challenges**: Diverse AI-focused challenges from different sponsors
 - **Challenge Participations**: Sample participations to show engagement
+- **6 Submissions**: Realistic submissions with scores for testing
+- **9 Badges**: Achievement badges distributed across users based on performance
 
 ## Seeded Users
 
@@ -16,6 +18,7 @@ The seed script creates realistic sample data including:
    - Platform administrator
    - Career Score: 1000
    - Admin & Sponsor privileges
+   - **Badges**: Season Champion 👑
 
 2. **OpenAI** (`openai@sponsor.com`)
    - AI research company
@@ -35,18 +38,21 @@ The seed script creates realistic sample data including:
 ### Developer Accounts
 1. **Alice Chen** (`alice.dev@example.com`)
    - Full-stack developer
-   - Career Score: 750
+   - Career Score: 850
    - Participating in multiple challenges
+   - **Badges**: Perfect Score 🏆, First Submission 🚀, Top 10% ⭐
 
 2. **Bob Martinez** (`bob.builder@example.com`)
    - AI researcher and startup founder
-   - Career Score: 680
+   - Career Score: 720
    - Active participant
+   - **Badges**: First Submission 🚀, Sponsor Favorite ❤️
 
 3. **Carol Thompson** (`carol.code@example.com`)
    - Data scientist specializing in NLP
-   - Career Score: 820
+   - Career Score: 890
    - Challenge participant
+   - **Badges**: Category Winner 🥇, First Submission 🚀, Top 10% ⭐
 
 ## Seeded Challenges
 
@@ -131,4 +137,40 @@ All seeded data follows these principles:
 - **Diverse**: Different types of AI applications and technologies
 - **Professional**: High-quality descriptions and requirements
 - **Engaging**: Interesting challenges that developers would actually want to solve
-- **Complete**: All required fields populated with meaningful data 
+- **Complete**: All required fields populated with meaningful data
+
+## Seeded Badges
+
+The platform includes various achievement badges that users can earn:
+
+### Badge Types and Recipients
+
+**🏆 Perfect Score** (Alice)
+- Achieved a score of 95+ points on a challenge
+- Awarded to Alice for her 95.0 score on the Smart Code Review Assistant challenge
+
+**🥇 Category Winner** (Carol)
+- Won first place in a specific challenge category
+- Awarded to Carol for her excellent performance in AI/ML challenges
+
+**⭐ Top 10%** (Alice, Carol)
+- Ranked in the top 10% of all participants this month
+- Shows consistent high performance across challenges
+
+**🚀 First Submission** (Alice, Bob, Carol)
+- Successfully submitted first challenge solution
+- Encourages platform engagement and getting started
+
+**❤️ Sponsor Favorite** (Bob)
+- Solution was selected as a sponsor favorite
+- Highlights solutions that particularly impressed company sponsors
+
+**👑 Season Champion** (EliteBuilders Admin)
+- Won the most challenges in a competition season
+- Ultimate achievement for sustained excellence
+
+### Badge Features
+- **Emoji Icons**: Using Twitter Emoji CDN for consistent, colorful badge display
+- **Realistic Distribution**: Based on actual user performance and submission scores
+- **Progressive Rewards**: From beginner (First Submission) to expert (Season Champion)
+- **Sponsor Integration**: Includes sponsor-awarded badges for business engagement 
