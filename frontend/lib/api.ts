@@ -1,6 +1,16 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import type { LoginResponse, User } from './types';
+import type { 
+  LoginResponse, 
+  User, 
+  Challenge, 
+  ChallengesResponse, 
+  CreateChallengeDto, 
+  UpdateChallengeDto, 
+  CreateSubmissionDto, 
+  Submission,
+  LeaderboardResponse 
+} from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -60,5 +70,91 @@ export const authApi = {
     Cookies.set('auth-token', token, { expires: 7 }); // 7 days
     const user = await authApi.getProfile();
     return { user, token };
+  },
+};
+
+export const challengesApi = {
+  // Get all challenges with filtering and pagination
+  getChallenges: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    creatorId?: number;
+    includeExpired?: boolean;
+    sortBy?: 'createdAt' | 'deadline' | 'prize';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<ChallengesResponse> => {
+    const response = await api.get('/challenges', { params });
+    return response.data;
+  },
+
+  // Get challenge by ID
+  getChallenge: async (id: number): Promise<Challenge> => {
+    const response = await api.get(`/challenges/${id}`);
+    return response.data;
+  },
+
+  // Create new challenge
+  createChallenge: async (data: CreateChallengeDto): Promise<Challenge> => {
+    const response = await api.post('/challenges', data);
+    return response.data;
+  },
+
+  // Update challenge
+  updateChallenge: async (id: number, data: UpdateChallengeDto): Promise<Challenge> => {
+    const response = await api.patch(`/challenges/${id}`, data);
+    return response.data;
+  },
+
+  // Delete challenge
+  deleteChallenge: async (id: number): Promise<void> => {
+    await api.delete(`/challenges/${id}`);
+  },
+
+  // Join challenge
+  joinChallenge: async (id: number): Promise<void> => {
+    await api.post(`/challenges/${id}/participate`);
+  },
+
+  // Leave challenge
+  leaveChallenge: async (id: number): Promise<void> => {
+    await api.delete(`/challenges/${id}/participate`);
+  },
+
+  // Get challenge leaderboard
+  getLeaderboard: async (id: number): Promise<LeaderboardResponse> => {
+    const response = await api.get(`/challenges/${id}/leaderboard`);
+    return response.data;
+  },
+};
+
+export const submissionsApi = {
+  // Create submission
+  createSubmission: async (challengeId: number, data: CreateSubmissionDto): Promise<Submission> => {
+    const response = await api.post(`/challenges/${challengeId}/submissions`, data);
+    return response.data;
+  },
+
+  // Get user's submissions
+  getMySubmissions: async (): Promise<Submission[]> => {
+    const response = await api.get('/submissions/me');
+    return response.data;
+  },
+
+  // Get submission by ID
+  getSubmission: async (id: number): Promise<Submission> => {
+    const response = await api.get(`/submissions/${id}`);
+    return response.data;
+  },
+
+  // Update submission
+  updateSubmission: async (id: number, data: Partial<CreateSubmissionDto>): Promise<Submission> => {
+    const response = await api.patch(`/submissions/${id}`, data);
+    return response.data;
+  },
+
+  // Delete submission
+  deleteSubmission: async (id: number): Promise<void> => {
+    await api.delete(`/submissions/${id}`);
   },
 }; 
