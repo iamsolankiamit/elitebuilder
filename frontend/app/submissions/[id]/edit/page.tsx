@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Upload, Github, FileText, Video } from 'lucide-react';
+import { ArrowLeft, Save, Github, FileText, Video } from 'lucide-react';
 
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -12,16 +12,16 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useChallenge, useCreateSubmission } from '@/hooks/use-challenges';
+import { useSubmission, useUpdateSubmission } from '@/hooks/use-challenges';
 import type { CreateSubmissionDto } from '@/lib/types';
 
-export default function SubmitPage() {
+export default function EditSubmissionPage() {
   const params = useParams();
   const router = useRouter();
-  const challengeId = parseInt(params.id as string);
+  const submissionId = parseInt(params.id as string);
   
-  const { data: challenge, isLoading: challengeLoading } = useChallenge(challengeId);
-  const createSubmissionMutation = useCreateSubmission();
+  const { data: submission, isLoading } = useSubmission(submissionId);
+  const updateSubmissionMutation = useUpdateSubmission();
   
   const [formData, setFormData] = useState<CreateSubmissionDto>({
     repoUrl: '',
@@ -30,6 +30,16 @@ export default function SubmitPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (submission) {
+      setFormData({
+        repoUrl: submission.repoUrl,
+        pitchDeck: submission.pitchDeck,
+        demoVideo: submission.demoVideo,
+      });
+    }
+  }, [submission]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -73,13 +83,13 @@ export default function SubmitPage() {
     }
 
     try {
-      await createSubmissionMutation.mutateAsync({
-        challengeId,
+      await updateSubmissionMutation.mutateAsync({
+        id: submissionId,
         data: formData,
       });
-      router.push(`/challenges/${challengeId}`);
+      router.push(`/submissions/${submissionId}`);
     } catch (error) {
-      console.error('Failed to create submission:', error);
+      console.error('Failed to update submission:', error);
     }
   };
 
@@ -94,7 +104,7 @@ export default function SubmitPage() {
     }
   };
 
-  if (challengeLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -106,16 +116,16 @@ export default function SubmitPage() {
     );
   }
 
-  if (!challenge) {
+  if (!submission) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">Challenge Not Found</h1>
-            <p className="text-muted-foreground mb-4">The challenge you're looking for doesn't exist.</p>
+            <h1 className="text-2xl font-bold mb-2">Submission Not Found</h1>
+            <p className="text-muted-foreground mb-4">The submission you are looking for does not exist.</p>
             <Button asChild>
-              <Link href="/challenges">Back to Challenges</Link>
+              <Link href="/submissions">Back to Submissions</Link>
             </Button>
           </div>
         </main>
@@ -124,54 +134,18 @@ export default function SubmitPage() {
     );
   }
 
-  const isExpired = new Date(challenge.deadline) < new Date();
-
-  if (isExpired) {
+  if (submission.status !== 'PENDING') {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">Challenge Expired</h1>
-            <p className="text-muted-foreground mb-4">This challenge has ended and no longer accepts submissions.</p>
+            <h1 className="text-2xl font-bold mb-2">Cannot Edit Submission</h1>
+            <p className="text-muted-foreground mb-4">
+              This submission cannot be edited because it is {submission.status.toLowerCase().replace('_', ' ')}.
+            </p>
             <Button asChild>
-              <Link href={`/challenges/${challengeId}`}>Back to Challenge</Link>
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!challenge.isParticipating) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">Not Participating</h1>
-            <p className="text-muted-foreground mb-4">You need to join this challenge before you can submit.</p>
-            <Button asChild>
-              <Link href={`/challenges/${challengeId}`}>Join Challenge</Link>
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (challenge.hasSubmitted) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">Already Submitted</h1>
-            <p className="text-muted-foreground mb-4">You have already submitted a solution for this challenge.</p>
-            <Button asChild>
-              <Link href={`/challenges/${challengeId}`}>View Challenge</Link>
+              <Link href={`/submissions/${submissionId}`}>View Submission</Link>
             </Button>
           </div>
         </main>
@@ -186,33 +160,40 @@ export default function SubmitPage() {
       
       <main className="flex-1">
         <AuthGuard>
-          {/* Hero Section */}
-          <section className="bg-gradient-to-br from-background via-background to-primary/5 py-16">
+          {/* Header */}
+          <section className="bg-gradient-to-br from-background via-background to-primary/5 py-12">
             <div className="container">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="max-w-4xl mx-auto text-center"
-              >
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
-                  Submit Solution
-                </h1>
-                <p className="text-xl text-muted-foreground mb-2">
-                  {challenge.title}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Deadline: {new Date(challenge.deadline).toLocaleDateString()} at {new Date(challenge.deadline).toLocaleTimeString()}
-                </p>
-              </motion.div>
+              <div className="max-w-2xl mx-auto">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => router.back()}
+                    className="mb-6"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
+                  </Button>
+                  
+                  <h1 className="text-3xl font-bold mb-2">
+                    Edit Submission
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Update your submission for Challenge #{submission.challengeId}
+                  </p>
+                </motion.div>
+              </div>
             </div>
           </section>
 
           {/* Form Section */}
           <section className="py-12">
             <div className="container">
-              <div className="max-w-2xl mx-auto space-y-8">
-                {/* Challenge Overview */}
+              <div className="max-w-2xl mx-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -220,34 +201,9 @@ export default function SubmitPage() {
                 >
                   <Card>
                     <CardHeader>
-                      <CardTitle>Challenge Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">
-                        {challenge.description}
-                      </p>
-                      
-                      <div className="bg-muted/50 p-4 rounded-lg">
-                        <h4 className="font-medium mb-2">Evaluation Criteria:</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {challenge.rubric}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Submission Form */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Submit Your Solution</CardTitle>
+                      <CardTitle>Update Your Submission</CardTitle>
                       <CardDescription>
-                        Provide links to your repository, pitch deck, and demo video
+                        Modify the links to your repository, pitch deck, and demo video
                       </CardDescription>
                     </CardHeader>
                     
@@ -272,9 +228,6 @@ export default function SubmitPage() {
                           {errors.repoUrl && (
                             <p className="text-sm text-destructive">{errors.repoUrl}</p>
                           )}
-                          <p className="text-sm text-muted-foreground">
-                            Link to your project's source code repository
-                          </p>
                         </div>
 
                         {/* Pitch Deck URL */}
@@ -296,9 +249,6 @@ export default function SubmitPage() {
                           {errors.pitchDeck && (
                             <p className="text-sm text-destructive">{errors.pitchDeck}</p>
                           )}
-                          <p className="text-sm text-muted-foreground">
-                            Link to your presentation slides (PDF, Google Slides, etc.)
-                          </p>
                         </div>
 
                         {/* Demo Video URL */}
@@ -320,20 +270,6 @@ export default function SubmitPage() {
                           {errors.demoVideo && (
                             <p className="text-sm text-destructive">{errors.demoVideo}</p>
                           )}
-                          <p className="text-sm text-muted-foreground">
-                            Link to your demo video (YouTube, Vimeo, Loom, etc.)
-                          </p>
-                        </div>
-
-                        {/* Submission Guidelines */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <h4 className="font-medium text-blue-900 mb-2">Submission Guidelines</h4>
-                          <ul className="text-sm text-blue-800 space-y-1">
-                            <li>• Ensure your repository is public or accessible</li>
-                            <li>• Include a clear README with setup instructions</li>
-                            <li>• Your pitch deck should explain the problem, solution, and implementation</li>
-                            <li>• Demo video should be 2-5 minutes showcasing your solution</li>
-                          </ul>
                         </div>
 
                         {/* Submit Button */}
@@ -342,33 +278,33 @@ export default function SubmitPage() {
                             type="button"
                             variant="outline"
                             onClick={() => router.back()}
-                            disabled={createSubmissionMutation.isPending}
+                            disabled={updateSubmissionMutation.isPending}
                           >
                             Cancel
                           </Button>
                           <Button
                             type="submit"
-                            disabled={createSubmissionMutation.isPending}
-                            className="flex-1 hover-lift glow-on-hover"
+                            disabled={updateSubmissionMutation.isPending}
+                            className="flex-1"
                           >
-                            {createSubmissionMutation.isPending ? (
+                            {updateSubmissionMutation.isPending ? (
                               <>
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                                Submitting...
+                                Updating...
                               </>
                             ) : (
                               <>
-                                <Upload className="mr-2 h-4 w-4" />
-                                Submit Solution
+                                <Save className="mr-2 h-4 w-4" />
+                                Update Submission
                               </>
                             )}
                           </Button>
                         </div>
 
-                        {createSubmissionMutation.error && (
+                        {updateSubmissionMutation.error && (
                           <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                             <p className="text-sm text-destructive">
-                              Failed to submit solution. Please try again.
+                              Failed to update submission. Please try again.
                             </p>
                           </div>
                         )}

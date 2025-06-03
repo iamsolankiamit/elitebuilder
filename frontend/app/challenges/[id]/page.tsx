@@ -107,6 +107,21 @@ export default function ChallengePage() {
 
   const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'leaderboard'>('overview');
 
+  // Debug logging
+  console.log('Challenge data:', {
+    challengeId,
+    userId: user?.id,
+    isParticipating: challenge?.isParticipating,
+    isAuthenticated,
+    challenge: challenge ? {
+      id: challenge.id,
+      title: challenge.title,
+      participantCount: challenge._count.participants,
+      isParticipating: challenge.isParticipating,
+      hasSubmitted: challenge.hasSubmitted
+    } : null
+  });
+
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -145,16 +160,18 @@ export default function ChallengePage() {
   const handleJoin = async () => {
     try {
       await joinMutation.mutateAsync(challengeId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to join challenge:', error);
+      alert(error?.response?.data?.message || 'Failed to join challenge. Please try again.');
     }
   };
 
   const handleLeave = async () => {
     try {
       await leaveMutation.mutateAsync(challengeId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to leave challenge:', error);
+      alert(error?.response?.data?.message || 'Failed to leave challenge. Please try again.');
     }
   };
 

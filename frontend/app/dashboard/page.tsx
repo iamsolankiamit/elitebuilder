@@ -9,7 +9,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { SubmissionCard } from '@/components/submissions';
 import { useMySubmissions } from '@/hooks/use-challenges';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -109,10 +109,17 @@ export default function Dashboard() {
                 >
                   <Card>
                     <CardHeader>
-                      <CardTitle>Recent Submissions</CardTitle>
-                      <CardDescription>
-                        Your latest challenge submissions
-                      </CardDescription>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle>Recent Submissions</CardTitle>
+                          <CardDescription>
+                            Your latest challenge submissions
+                          </CardDescription>
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href="/submissions">View All</Link>
+                        </Button>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       {submissionsLoading ? (
@@ -125,35 +132,14 @@ export default function Dashboard() {
                           ))}
                         </div>
                       ) : submissions && submissions.length > 0 ? (
-                        <div className="space-y-4">
-                          {submissions.slice(0, 5).map((submission) => (
-                            <div key={submission.id} className="flex items-center justify-between">
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium leading-none">
-                                  Challenge #{submission.challengeId}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  Submitted {new Date(submission.createdAt).toLocaleDateString()}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                {submission.score && (
-                                  <Badge variant="success" className="text-xs">
-                                    {submission.score}/100
-                                  </Badge>
-                                )}
-                                <Badge 
-                                  variant={
-                                    submission.status === 'SCORED' ? 'success' :
-                                    submission.status === 'UNDER_REVIEW' ? 'warning' :
-                                    submission.status === 'REJECTED' ? 'destructive' : 'secondary'
-                                  }
-                                  className="text-xs"
-                                >
-                                  {submission.status.replace('_', ' ')}
-                                </Badge>
-                              </div>
-                            </div>
+                        <div className="space-y-3">
+                          {submissions.slice(0, 3).map((submission, index) => (
+                            <SubmissionCard 
+                              key={submission.id} 
+                              submission={submission} 
+                              compact 
+                              index={index}
+                            />
                           ))}
                         </div>
                       ) : (
@@ -200,13 +186,22 @@ export default function Dashboard() {
                           Create New Challenge
                         </Link>
                       </Button>
-                      
+
                       <Button asChild className="w-full justify-start" variant="outline">
-                        <Link href="/leaderboard">
-                          <Star className="mr-2 h-4 w-4" />
-                          View Leaderboard
+                        <Link href="/submissions">
+                          <Upload className="mr-2 h-4 w-4" />
+                          My Submissions
                         </Link>
                       </Button>
+
+                      {user?.isSponsor && (
+                        <Button asChild className="w-full justify-start" variant="outline">
+                          <Link href="/sponsor/dashboard">
+                            <Star className="mr-2 h-4 w-4" />
+                            Sponsor Dashboard
+                          </Link>
+                        </Button>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>

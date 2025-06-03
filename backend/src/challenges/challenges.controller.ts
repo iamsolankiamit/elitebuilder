@@ -15,6 +15,7 @@ import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { ChallengeQueryDto } from './dto/challenge-query.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
 
 interface User {
@@ -45,6 +46,7 @@ export class ChallengesController {
   }
 
   @Get(':id')
+  @UseGuards(OptionalJwtAuthGuard)
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user?: User,
