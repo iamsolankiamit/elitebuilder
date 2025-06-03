@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { ChallengeQueryDto } from './dto/challenge-query.dto';
-import { Prisma } from '../../generated/prisma';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ChallengesService {
