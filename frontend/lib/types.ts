@@ -36,6 +36,116 @@ export interface ApiError {
   error?: string;
 }
 
+// Badge types
+export enum BadgeType {
+  TOP_10_PERCENT = 'TOP_10_PERCENT',
+  CATEGORY_WINNER = 'CATEGORY_WINNER', 
+  SPONSOR_FAVORITE = 'SPONSOR_FAVORITE',
+  FIRST_SUBMISSION = 'FIRST_SUBMISSION',
+  PERFECT_SCORE = 'PERFECT_SCORE',
+  SEASON_CHAMPION = 'SEASON_CHAMPION',
+}
+
+export interface Badge {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  type: BadgeType;
+  userId: number;
+  createdAt: string;
+  user?: {
+    id: number;
+    username: string;
+    name: string | null;
+    avatar: string | null;
+  };
+}
+
+export interface BadgeStats {
+  totalBadges: number;
+  badgesByType: Record<BadgeType, number>;
+  recentBadges: Badge[];
+}
+
+export interface SponsorBadgeActivity {
+  badgeId: number;
+  badge: Badge;
+  awardedBy: {
+    id: number;
+    name: string;
+    username: string;
+  };
+  awardedTo: {
+    id: number;
+    name: string;
+    username: string;
+  };
+  challengeId?: number;
+  challenge?: {
+    id: number;
+    title: string;
+  };
+  reason?: string;
+  createdAt: string;
+}
+
+export interface SponsorFavorite {
+  rank: number;
+  badge: Badge;
+  user: {
+    id: number;
+    username: string;
+    name: string | null;
+    avatar: string | null;
+    location: string | null;
+    githubUrl: string | null;
+    careerScore: number;
+  };
+}
+
+export interface UserBadgeProfile {
+  badges: Badge[];
+  stats: {
+    totalBadges: number;
+    badgesByType: Record<BadgeType, number>;
+  };
+}
+
+export interface BadgesResponse {
+  badges: Badge[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateBadgeDto {
+  name: string;
+  description: string;
+  imageUrl: string;
+  type: BadgeType;
+  userId: number;
+}
+
+export interface AwardSponsorBadgeDto {
+  userId: number;
+  challengeId?: number;
+  reason?: string;
+  customName?: string;
+  customDescription?: string;
+}
+
+export interface BadgeQueryParams {
+  page?: number;
+  limit?: number;
+  userId?: number;
+  type?: BadgeType;
+  search?: string;
+}
+
 // Challenge types
 export interface Challenge {
   id: number;

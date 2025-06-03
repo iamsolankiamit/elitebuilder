@@ -10,6 +10,7 @@ import { ChallengesModule } from './challenges/challenges.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { BadgesModule } from './badges/badges.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     SubmissionsModule,
     EvaluationModule,
     LeaderboardModule,
+    BadgesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,7 +14,16 @@ import type {
   LeaderboardPeriod,
   LeaderboardCategory,
   SortBy,
-  UserRankingInfo
+  UserRankingInfo,
+  Badge,
+  BadgeStats,
+  SponsorBadgeActivity,
+  SponsorFavorite,
+  UserBadgeProfile,
+  BadgesResponse,
+  CreateBadgeDto,
+  AwardSponsorBadgeDto,
+  BadgeQueryParams
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -229,5 +238,56 @@ export const leaderboardApi = {
   }> => {
     const response = await api.get('/leaderboard/stats');
     return response.data;
+  },
+};
+
+export const badgesApi = {
+  // Get badges with filtering and pagination
+  getBadges: async (params?: BadgeQueryParams): Promise<BadgesResponse> => {
+    const response = await api.get('/badges', { params });
+    return response.data;
+  },
+
+  // Get badge statistics
+  getBadgeStats: async (): Promise<BadgeStats> => {
+    const response = await api.get('/badges/stats');
+    return response.data;
+  },
+
+  // Get sponsor favorites
+  getSponsorFavorites: async (limit?: number): Promise<SponsorFavorite[]> => {
+    const params = limit ? { limit } : undefined;
+    const response = await api.get('/badges/sponsor/favorites', { params });
+    return response.data;
+  },
+
+  // Get sponsor badge activity (requires sponsor auth)
+  getSponsorBadgeActivity: async (limit?: number): Promise<SponsorBadgeActivity[]> => {
+    const params = limit ? { limit } : undefined;
+    const response = await api.get('/badges/sponsor/activity', { params });
+    return response.data;
+  },
+
+  // Get user badges
+  getUserBadges: async (userId: number): Promise<UserBadgeProfile> => {
+    const response = await api.get(`/badges/user/${userId}`);
+    return response.data;
+  },
+
+  // Create badge (admin only)
+  createBadge: async (data: CreateBadgeDto): Promise<Badge> => {
+    const response = await api.post('/badges', data);
+    return response.data;
+  },
+
+  // Award sponsor badge (sponsors only)
+  awardSponsorBadge: async (data: AwardSponsorBadgeDto): Promise<Badge> => {
+    const response = await api.post('/badges/sponsor/award', data);
+    return response.data;
+  },
+
+  // Delete badge
+  deleteBadge: async (badgeId: number): Promise<void> => {
+    await api.delete(`/badges/${badgeId}`);
   },
 }; 

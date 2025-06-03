@@ -46,7 +46,7 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem'
 
 export function Header() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, login } = useAuth();
 
   return (
     <motion.header
@@ -76,7 +76,7 @@ export function Header() {
                       <NavigationMenuLink asChild>
                         <a
                           className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          href="/"
+                          href="/challenges"
                         >
                           <div className="mb-2 mt-4 text-lg font-medium">
                             Featured Challenge
@@ -95,11 +95,11 @@ export function Header() {
                     <ListItem href="/challenges" title="All Challenges">
                       Browse all available challenges
                     </ListItem>
-                    <ListItem href="/challenges/popular" title="Popular">
-                      Most popular challenges this month
+                    <ListItem href="/challenges/create" title="Create Challenge">
+                      Submit your own challenge idea
                     </ListItem>
-                    <ListItem href="/challenges/new" title="New">
-                      Recently added challenges
+                    <ListItem href="/dashboard" title="My Submissions">
+                      Track your challenge submissions
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
@@ -108,6 +108,9 @@ export function Header() {
                 <NavigationMenuTrigger>Leaderboard</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem href="/leaderboard" title="All Rankings">
+                      See the complete leaderboard
+                    </ListItem>
                     <ListItem href="/leaderboard/global" title="Global Rankings">
                       See the top builders worldwide
                     </ListItem>
@@ -117,12 +120,33 @@ export function Header() {
                     <ListItem href="/leaderboard/categories" title="By Category">
                       Rankings by challenge category
                     </ListItem>
-                    <ListItem href="/leaderboard/sponsors" title="Sponsor Favorites">
+                    <ListItem href="/leaderboard/sponsor-favorites" title="Sponsor Favorites">
                       Submissions loved by sponsors
+                    </ListItem>
+                    <ListItem href="/badges" title="Badges & Recognition">
+                      View and earn achievement badges
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              {isAuthenticated && (
+                <NavigationMenuItem>
+                  <Link href="/dashboard" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Dashboard
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              )}
+              {isAuthenticated && (
+                <NavigationMenuItem>
+                  <Link href="/badges" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Badges
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              )}
               <NavigationMenuItem>
                 <Link href="/sponsors" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -142,7 +166,12 @@ export function Header() {
             ) : (
               <>
                 <LoginButton variant="ghost" size="sm" className="hover-lift" />
-                <Button variant="premium" size="pill-sm" className="hover-lift glow-on-hover">
+                <Button 
+                  onClick={login}
+                  variant="premium" 
+                  size="pill-sm" 
+                  className="hover-lift glow-on-hover"
+                >
                   Join Now
                 </Button>
               </>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { 
@@ -85,10 +86,14 @@ export function UserMenu() {
 
             {/* Menu Items */}
             <div className="py-3 space-y-1">
-              <button className="w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
+              <Link 
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
                 <User className="h-4 w-4" />
                 Profile
-              </button>
+              </Link>
               
               <button className="w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
                 <Settings className="h-4 w-4" />
